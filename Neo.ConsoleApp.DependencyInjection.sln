@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo.ConsoleApp.DependencyInjection", "Neo.ConsoleApp.DependencyInjection\Neo.ConsoleApp.DependencyInjection.csproj", "{7219623C-4DD1-4AC0-8AB5-B5F08C59DEB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo.ConsoleApp.DependencyInjection", "Neo.ConsoleApp.DependencyInjection\Neo.ConsoleApp.DependencyInjection.csproj", "{7219623C-4DD1-4AC0-8AB5-B5F08C59DEB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo.ConsoleApp.DependencyInjection.Tests", "Neo.ConsoleApp.DependencyInjection.Tests\Neo.ConsoleApp.DependencyInjection.Tests.csproj", "{7E6B44B8-02D7-4447-9DE8-DC343741C027}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo.ConsoleApp.DependencyInjection.Tests", "Neo.ConsoleApp.DependencyInjection.Tests\Neo.ConsoleApp.DependencyInjection.Tests.csproj", "{7E6B44B8-02D7-4447-9DE8-DC343741C027}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
