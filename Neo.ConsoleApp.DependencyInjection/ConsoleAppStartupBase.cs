@@ -10,60 +10,76 @@ namespace Neo.ConsoleApp.DependencyInjection
     public abstract class ConsoleAppStartupBase
     {
         private readonly string[] args;
+        private const string AppSettingsJson = "appsettings.json";
+        private const LogLevel MinLogLevel = LogLevel.Information;
 
         protected ConsoleAppStartupBase(string[] args) => this.args = args;
 
         protected IConfigurationRoot Configuration { get; private set; }
-        protected IServiceProvider ServiceProvider { get; private set; }
-        protected ILogger Logger { get; private set; }
+
+        private void BaseConfigure(IConfigurationBuilder config)
+        {
+            config
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
+                .SetBasePath(GetEntryDirectory().FullName)
+                .AddJsonFile(AppSettingsJson, true, true);
+
+            Configure(config);
+        }
 
         protected virtual void Configure(IConfigurationBuilder config)
         {
+        }
+
+
+        private void BaseConfigureServices(IServiceCollection services)
+        {
+            services
+                .AddOptions()
+                .AddLogging(BaseConfigureLogging)
+                .Configure<LoggerFilterOptions>(options => options.MinLevel = MinLogLevel);
+
+            ConfigureServices(services);
         }
 
         protected virtual void ConfigureServices(IServiceCollection services)
         {
         }
 
-        protected virtual void ConfigureLogging(ILoggerFactory loggerFactory)
+        private void BaseConfigureLogging(ILoggingBuilder loggingBuilder)
+        {
+            loggingBuilder
+                .AddConsole()
+                .AddDebug();
+
+            ConfigureLogging(loggingBuilder);
+        }
+
+        protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
         {
         }
 
-        protected TApp Configure<TApp>() where TApp : class, IConsoleApp =>
-            Configure(services => services.AddSingleton<TApp>()).GetRequiredService<TApp>();
+        protected ServiceProvider Configure<TApp>() where TApp : class, IConsoleApp =>
+            Configure(services => services.AddSingleton<TApp>());
 
-        protected TApp Configure<TApp, TResult>() where TApp : class, IConsoleApp<TResult> =>
-            Configure(services => services.AddSingleton<TApp>()).GetRequiredService<TApp>();
+        protected ServiceProvider Configure<TApp, TResult>() where TApp : class, IConsoleApp<TResult> =>
+            Configure(services => services.AddSingleton<TApp>());
 
-        private IServiceProvider Configure(Action<IServiceCollection> registerConsoleApp)
+        private ServiceProvider Configure(Action<IServiceCollection> registerConsoleApp)
         {
-            var configurationBuilder = new ConfigurationBuilder()
-                .AddEnvironmentVariables()
-                .AddCommandLine(args)
-                .SetBasePath(GetEntryDirectory().FullName)
-                .AddJsonFile("appsettings.json", true, true);
+            if(Configuration is null)
+            {
+                var configurationBuilder = new ConfigurationBuilder();
+                BaseConfigure(configurationBuilder);
+                Configuration = configurationBuilder.Build();
+            }
 
-            Configure(configurationBuilder);
-
-            Configuration = configurationBuilder.Build();
-
-            var services = new ServiceCollection()
-                .AddOptions()
-                .AddLogging();
-
+            var services = new ServiceCollection();
             registerConsoleApp(services);
+            BaseConfigureServices(services);
 
-            ConfigureServices(services);
-
-            ServiceProvider = services.BuildServiceProvider();
-
-            var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
-
-            ConfigureLogging(loggerFactory);
-
-            Logger = loggerFactory.CreateLogger(nameof(ConsoleAppStartup));
-
-            return ServiceProvider;
+            return services.BuildServiceProvider();
         }
 
         private static DirectoryInfo GetEntryDirectory() =>
