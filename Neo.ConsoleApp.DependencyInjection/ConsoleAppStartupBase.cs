@@ -20,10 +20,10 @@ namespace Neo.ConsoleApp.DependencyInjection
         private void BaseConfigure(IConfigurationBuilder config)
         {
             config
-                .AddEnvironmentVariables()
-                .AddCommandLine(args)
                 .SetBasePath(GetEntryDirectory().FullName)
-                .AddJsonFile(AppSettingsJson, true, true);
+                .AddJsonFile(AppSettingsJson, true, true)
+                .AddEnvironmentVariables()
+                .AddCommandLine(args);
 
             Configure(config);
         }
